@@ -1,0 +1,248 @@
+body {
+  margin: 0;
+  font-family: "Microsoft JhengHei", Arial, sans-serif;
+  background: #f4f4f4;
+  color: #222;
+}
+
+.app {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+h1, h2 {
+  margin-top: 0;
+}
+
+.sub-title {
+  margin-top: -8px;
+  color: #666;
+}
+
+.card {
+  background: white;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+label {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+select,
+input,
+button {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+button {
+  margin-top: 14px;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  background: #222;
+  color: white;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button.danger {
+  background: #b02a37;
+}
+
+#themeBtn {
+  width: auto;
+  white-space: nowrap;
+  margin-top: 0;
+}
+
+.button-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.shift-row {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.hint {
+  color: #666;
+  font-size: 14px;
+}
+
+.result {
+  font-size: 20px;
+  font-weight: bold;
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+}
+
+.result span,
+.card span {
+  color: #d6336c;
+  font-weight: bold;
+}
+
+/* 匯入 */
+.import-label {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 14px;
+  text-align: center;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: #555;
+  color: white;
+  cursor: pointer;
+}
+
+.import-label input {
+  display: none;
+}
+
+/* 發薪總覽 */
+.overview-item {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.overview-item:hover {
+  background: #f7f7f7;
+}
+
+.overview-item.active {
+  border-color: #d6336c;
+  background: #fff0f5;
+}
+
+.overview-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.overview-main span {
+  color: #666;
+  font-size: 14px;
+}
+
+.overview-money {
+  font-weight: bold;
+  color: #d6336c;
+  white-space: nowrap;
+}
+
+/* 深色模式 */
+body.dark {
+  background: #121212;
+  color: #eee;
+}
+
+body.dark .sub-title {
+  color: #aaa;
+}
+
+body.dark .card {
+  background: #1f1f1f;
+}
+
+body.dark input,
+body.dark select {
+  background: #2b2b2b;
+  color: white;
+  border: 1px solid #555;
+}
+
+body.dark button {
+  background: #d6336c;
+}
+
+body.dark button.danger {
+  background: #b02a37;
+}
+
+body.dark .hint {
+  color: #aaa;
+}
+
+body.dark .import-label {
+  background: #444;
+}
+
+body.dark .overview-item {
+  border-color: #444;
+}
+
+body.dark .overview-item:hover {
+  background: #2a2a2a;
+}
+
+body.dark .overview-item.active {
+  background: #3a1f2b;
+  border-color: #d6336c;
+}
+
+body.dark .overview-main span {
+  color: #aaa;
+}
+
+/* 手機版 */
+@media (max-width: 560px) {
+  .top-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #themeBtn {
+    width: 100%;
+  }
+
+  .button-row {
+    grid-template-columns: 1fr;
+  }
+
+  .overview-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .overview-money {
+    white-space: normal;
+  }
+
+  .shift-row {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>薪水計算器</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <div class="top-bar">
+      <div>
+        <h1>薪水計算器</h1>
+        <p class="sub-title">班表工時計算、發薪總覽、資料備份</p>
+      </div>
+      <button id="themeBtn">切換深色</button>
+    </div>
+
+    <div class="card">
+      <h2>基本設定</h2>
+
+      <label>年份</label>
+      <input type="number" id="yearInput" value="2026" />
+
+      <label>時薪</label>
+      <input type="number" id="wageInput" value="205" />
+
+      <label>第一個已知發薪日</label>
+      <input type="date" id="firstPaydayInput" value="2026-04-11" />
+
+      <button id="generateBtn">產生發薪表</button>
+      <p class="hint">目前規則：發薪日往前 28 天是該期結束日，再往前 13 天是該期開始日。</p>
+    </div>
+
+    <div class="card">
+      <h2>年度統計</h2>
+      <p>今年總工時：<span id="yearHours">0</span> 小時</p>
+      <p>今年預估薪水：<span id="yearPay">0</span> 元</p>
+      <p class="hint">這裡統計的是「該年份實際上班日期」的總工時與金額。</p>
+    </div>
+
+    <div class="card">
+      <h2>資料備份</h2>
+      <p class="hint">資料目前存在這台瀏覽器。建議偶爾匯出備份，避免清快取後資料消失。</p>
+
+      <div class="button-row">
+        <button id="exportBtn">匯出紀錄</button>
+        <button id="clearBtn" class="danger">清空工時</button>
+      </div>
+
+      <label class="import-label">
+        匯入紀錄
+        <input type="file" id="importFile" accept=".json" />
+      </label>
+
+      <p id="backupStatus" class="hint"></p>
+    </div>
+
+    <div class="card">
+      <h2>發薪總覽</h2>
+      <p class="hint">點某一列，可以快速切到那次發薪日。</p>
+      <div class="button-row">
+        <button id="toggleOverviewBtn">只顯示最近 6 次</button>
+      </div>
+      <div id="payOverview"></div>
+    </div>
+
+    <div class="card">
+      <h2>填寫工時</h2>
+
+      <label>選擇領薪日</label>
+      <select id="paydaySelect"></select>
+
+      <p id="periodText">請選擇領薪日</p>
+      <p class="hint">沒上班不用填，空白會自動當 0。輸入後會自動儲存。</p>
+
+      <div id="shiftList"></div>
+      <p id="saveStatus" class="hint"></p>
+    </div>
+
+    <div class="card result">
+      <p>本次總時數：<span id="totalHours">0</span> 小時</p>
+      <p>本次預估薪水：<span id="totalPay">0</span> 元</p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
