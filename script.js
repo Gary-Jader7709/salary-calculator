@@ -1,6 +1,5 @@
 const yearInput = document.getElementById("yearInput");
 const wageInput = document.getElementById("wageInput");
-const firstPaydayInput = document.getElementById("firstPaydayInput");
 const generateBtn = document.getElementById("generateBtn");
 
 const paydaySelect = document.getElementById("paydaySelect");
@@ -26,9 +25,6 @@ let payPeriods = [];
 let showAllOverview = false;
 let saveTimer = null;
 
-// =====================
-// 初始化
-// =====================
 loadSettings();
 generatePayPeriods();
 renderPaydayOptions();
@@ -37,9 +33,6 @@ renderPeriod();
 updateYearSummary();
 renderPayOverview();
 
-// =====================
-// 事件
-// =====================
 generateBtn.addEventListener("click", () => {
   const currentPayday = getCurrentSelectedPayday();
 
@@ -77,10 +70,6 @@ yearInput.addEventListener("input", () => {
   saveSettings();
 });
 
-firstPaydayInput.addEventListener("input", () => {
-  saveSettings();
-});
-
 themeBtn.addEventListener("click", () => {
   document.body.classList.toggle("dark");
 
@@ -100,24 +89,18 @@ exportBtn.addEventListener("click", exportData);
 importFile.addEventListener("change", importData);
 clearBtn.addEventListener("click", clearAllShifts);
 
-// =====================
-// 設定儲存
-// =====================
 function saveSettings() {
   localStorage.setItem("salary_year", yearInput.value);
   localStorage.setItem("salary_wage", wageInput.value);
-  localStorage.setItem("salary_first_payday", firstPaydayInput.value);
 }
 
 function loadSettings() {
   const savedYear = localStorage.getItem("salary_year");
   const savedWage = localStorage.getItem("salary_wage");
-  const savedFirstPayday = localStorage.getItem("salary_first_payday");
   const savedTheme = localStorage.getItem("salary_theme");
 
   if (savedYear) yearInput.value = savedYear;
   if (savedWage) wageInput.value = savedWage;
-  if (savedFirstPayday) firstPaydayInput.value = savedFirstPayday;
 
   if (savedTheme === "dark") {
     document.body.classList.add("dark");
@@ -125,62 +108,49 @@ function loadSettings() {
   }
 }
 
-// =====================
-// 產生發薪區間
-// 規則：
-// 發薪日往前 28 天 = 該期結束日
-// 該期結束日往前 13 天 = 該期開始日
-// 例如：
-// 2026/4/11 領 2026/3/1～2026/3/14
-// 2026/4/25 領 2026/3/15～2026/3/28
-// 2026/5/9  領 2026/3/29～2026/4/11
-// =====================
 function generatePayPeriods() {
   payPeriods = [];
 
   const year = Number(yearInput.value);
-  const firstPaydayValue = firstPaydayInput.value;
+  if (!year) return;
 
-  if (!year || !firstPaydayValue) return;
+  for (let month = 1; month <= 12; month++) {
+    const previousMonthDate = new Date(year, month - 2, 1);
+    const previousYear = previousMonthDate.getFullYear();
+    const previousMonth = previousMonthDate.getMonth();
 
-  const firstPayday = parseLocalDate(firstPaydayValue);
-  let payday = new Date(firstPayday);
+    const firstStart = new Date(previousYear, previousMonth, 1);
+    const firstEnd = new Date(previousYear, previousMonth, 15);
 
-  while (payday.getFullYear() >= year) {
-    payday.setDate(payday.getDate() - 14);
-  }
+    const secondStart = new Date(previousYear, previousMonth, 16);
+    const secondEnd = new Date(previousYear, previousMonth + 1, 0);
 
-  payday.setDate(payday.getDate() + 14);
+    const secondSaturday = getNthWeekdayOfMonth(year, month - 1, 6, 2);
+    const fourthSaturday = getNthWeekdayOfMonth(year, month - 1, 6, 4);
 
-  while (payday.getFullYear() <= year) {
-    if (payday.getFullYear() === year) {
-      const periodEnd = new Date(payday);
-      periodEnd.setDate(periodEnd.getDate() - 28);
+    payPeriods.push({
+      payday: formatInputDate(secondSaturday),
+      start: formatInputDate(firstStart),
+      end: formatInputDate(firstEnd),
+      label: "上半月"
+    });
 
-      const periodStart = new Date(periodEnd);
-      periodStart.setDate(periodStart.getDate() - 13);
-
-      payPeriods.push({
-        payday: formatInputDate(payday),
-        start: formatInputDate(periodStart),
-        end: formatInputDate(periodEnd)
-      });
-    }
-
-    payday.setDate(payday.getDate() + 14);
+    payPeriods.push({
+      payday: formatInputDate(fourthSaturday),
+      start: formatInputDate(secondStart),
+      end: formatInputDate(secondEnd),
+      label: "下半月"
+    });
   }
 }
 
-// =====================
-// 發薪日選單
-// =====================
 function renderPaydayOptions(keepPayday = null) {
   paydaySelect.innerHTML = "";
 
   payPeriods.forEach((period, index) => {
     const option = document.createElement("option");
     option.value = index;
-    option.textContent = `${formatDisplayDate(period.payday)} 領薪｜${formatDisplayDate(period.start)}～${formatDisplayDate(period.end)}`;
+    option.textContent = `${formatDisplayDate(period.payday)} 領薪｜${formatDisplayDate(period.start)}～${formatDisplayDate(period.end)}｜${period.label}`;
     paydaySelect.appendChild(option);
   });
 
@@ -217,9 +187,6 @@ function selectNearestPayday() {
   paydaySelect.value = nearestIndex;
 }
 
-// =====================
-// 顯示某次發薪區間
-// =====================
 function renderPeriod() {
   const period = payPeriods[paydaySelect.value];
 
@@ -230,7 +197,7 @@ function renderPeriod() {
     return;
   }
 
-  periodText.textContent = `本次計薪區間：${formatDisplayDate(period.start)} ～ ${formatDisplayDate(period.end)}`;
+  periodText.textContent = `本次計薪區間：${formatDisplayDate(period.start)} ～ ${formatDisplayDate(period.end)}（${period.label}）`;
 
   shiftList.innerHTML = "";
 
@@ -263,9 +230,6 @@ function renderPeriod() {
   calculateCurrentPeriod();
 }
 
-// =====================
-// 計算本次薪水
-// =====================
 function calculateCurrentPeriod() {
   const inputs = document.querySelectorAll(".hours-input");
   let totalHours = 0;
@@ -282,9 +246,6 @@ function calculateCurrentPeriod() {
   totalPayText.textContent = totalPay.toLocaleString();
 }
 
-// =====================
-// 發薪總覽
-// =====================
 function renderPayOverview() {
   if (!payOverview) return;
 
@@ -312,7 +273,7 @@ function renderPayOverview() {
 
     item.innerHTML = `
       <div class="overview-main">
-        <strong>${formatDisplayDate(period.payday)} 領薪</strong>
+        <strong>${formatDisplayDate(period.payday)} 領薪｜${period.label}</strong>
         <span>${formatDisplayDate(period.start)} ～ ${formatDisplayDate(period.end)}</span>
       </div>
       <div class="overview-money">${statusText}</div>
@@ -368,11 +329,6 @@ function calculatePeriodHours(start, end) {
   return totalHours;
 }
 
-// =====================
-// 年度統計
-// 這裡統計的是「該年份實際上班日期」的總工時
-// 不是「該年份領到的薪水」
-// =====================
 function updateYearSummary() {
   const year = Number(yearInput.value);
   const wage = Number(wageInput.value) || 0;
@@ -395,17 +351,14 @@ function updateYearSummary() {
   yearPayText.textContent = totalPay.toLocaleString();
 }
 
-// =====================
-// 匯出 / 匯入資料
-// =====================
 function exportData() {
   const data = {
-    version: 1,
+    version: 2,
+    rule: "1-15 and 16-end; paid next month on 2nd and 4th Saturday",
     exportedAt: new Date().toISOString(),
     settings: {
       year: yearInput.value,
       wage: wageInput.value,
-      firstPayday: firstPaydayInput.value,
       theme: localStorage.getItem("salary_theme") || "light"
     },
     shifts: JSON.parse(localStorage.getItem("salary_shifts") || "{}")
@@ -453,7 +406,6 @@ function importData(event) {
       if (data.settings) {
         if (data.settings.year) yearInput.value = data.settings.year;
         if (data.settings.wage) wageInput.value = data.settings.wage;
-        if (data.settings.firstPayday) firstPaydayInput.value = data.settings.firstPayday;
       }
 
       localStorage.setItem("salary_shifts", JSON.stringify(data.shifts));
@@ -488,9 +440,6 @@ function clearAllShifts() {
   backupStatus.textContent = "已清空全部工時紀錄。";
 }
 
-// =====================
-// 每日工時儲存
-// =====================
 function saveShift(dateKey, hours) {
   const allShifts = JSON.parse(localStorage.getItem("salary_shifts") || "{}");
 
@@ -519,9 +468,6 @@ function showSavedMessage() {
   }, 1200);
 }
 
-// =====================
-// 日期工具
-// =====================
 function parseLocalDate(dateString) {
   const [year, month, day] = dateString.split("-").map(Number);
   return new Date(year, month - 1, day);
@@ -551,4 +497,22 @@ function formatHours(hours) {
 function getTodayString() {
   const today = new Date();
   return formatInputDate(today);
+}
+
+function getNthWeekdayOfMonth(year, monthIndex, weekday, nth) {
+  const date = new Date(year, monthIndex, 1);
+  let count = 0;
+
+  while (date.getMonth() === monthIndex) {
+    if (date.getDay() === weekday) {
+      count++;
+      if (count === nth) {
+        return new Date(date);
+      }
+    }
+
+    date.setDate(date.getDate() + 1);
+  }
+
+  return null;
 }

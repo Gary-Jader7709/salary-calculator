@@ -107,7 +107,6 @@ button.danger {
   font-weight: bold;
 }
 
-/* 匯入 */
 .import-label {
   display: block;
   width: 100%;
@@ -125,7 +124,6 @@ button.danger {
   display: none;
 }
 
-/* 發薪總覽 */
 .overview-item {
   padding: 12px;
   border: 1px solid #ddd;
@@ -164,7 +162,6 @@ button.danger {
   white-space: nowrap;
 }
 
-/* 深色模式 */
 body.dark {
   background: #121212;
   color: #eee;
@@ -218,7 +215,6 @@ body.dark .overview-main span {
   color: #aaa;
 }
 
-/* 手機版 */
 @media (max-width: 560px) {
   .top-bar {
     flex-direction: column;
